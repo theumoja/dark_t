@@ -32,41 +32,33 @@ async function main() {
   const imageFiles = await listRepoFiles(IMAGE_REPO);
   console.log(`Found ${imageFiles.length} image files.`);
 
-  // Build two image maps:
-  // 1. For movies: base name (no extension) → full path (flat only)
-  // 2. For series: series folder name → full path (images inside "series/" folder)
   const movieImageMap = new Map();
   const seriesImageMap = new Map();
 
   for (const imgPath of imageFiles) {
     const parts = imgPath.split('/');
     if (parts.length === 1) {
-      // Top‑level image → movie poster candidate
       const base = imgPath.replace(/\.[^/.]+$/, '');
       movieImageMap.set(base, imgPath);
     } else if (parts[0] === 'series' && parts.length === 2) {
-      // series/SeriesName.ext
       const seriesName = parts[1].replace(/\.[^/.]+$/, '');
       seriesImageMap.set(seriesName, imgPath);
     }
   }
 
-  // Separate video files into movies (top‑level) and series (inside series/...)
   const movies = [];
-  const seriesMap = new Map(); // seriesName → { season: [episodes] }
+  const seriesMap = new Map();
 
   for (const vidPath of videoFiles) {
     const parts = vidPath.split('/');
-
     if (parts[0] === 'series') {
-      // series/SeriesName/SeasonFolder/EpisodeFile.mp4.enc
       if (parts.length < 4) {
         console.warn(`Skipping invalid series path: ${vidPath}`);
         continue;
       }
       const seriesName = parts[1];
       const seasonFolder = parts[2];
-      const episodeFile = parts.slice(3).join('/'); // in case of deeper nesting
+      const episodeFile = parts.slice(3).join('/');
       const episodeTitle = episodeFile.replace(/\.mp4\.enc$/, '').replace(/[_\-]/g, ' ');
 
       if (!seriesMap.has(seriesName)) {
@@ -82,7 +74,6 @@ async function main() {
         keyHex: DEFAULT_KEY
       });
     } else {
-      // Top‑level video → movie
       const base = vidPath.replace(/\.mp4\.enc$/, '');
       const posterPath = movieImageMap.get(base);
       if (posterPath) {
@@ -102,14 +93,12 @@ async function main() {
     }
   }
 
-  // Build series_list.json
   const seriesList = [];
   for (const [seriesName, seasonsObj] of seriesMap) {
     const posterPath = seriesImageMap.get(seriesName);
     const posterUrl = posterPath
       ? rawUrl(IMAGE_REPO, posterPath)
-      : 'https://picsum.photos/seed/default/300/400'; // fallback
-
+      : 'https://picsum.photos/seed/default/300/400';
     seriesList.push({
       id: seriesList.length + 1,
       title: seriesName,
@@ -124,7 +113,6 @@ async function main() {
   const fs = await import('fs');
   fs.writeFileSync('movie_list.json', JSON.stringify(movies, null, 2));
   console.log(`movie_list.json written with ${movies.length} movies.`);
-
   fs.writeFileSync('series_list.json', JSON.stringify(seriesList, null, 2));
   console.log(`series_list.json written with ${seriesList.length} series.`);
 }
