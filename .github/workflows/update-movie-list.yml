@@ -1,17 +1,17 @@
-name: Update movie list from Hugging Face
+name: Update movie & series lists from Hugging Face
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'   # daily
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:                # <-- add this block
-      contents: write           # allow pushing commits
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,14 +21,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Generate movie_list.json
+      - name: Generate movie_list.json and series_list.json
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: node scripts/generate-movie-list.mjs
+        run: node scripts/generate-lists.mjs
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add movie_list.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update movie_list.json [skip ci]" && git push)
+          git add movie_list.json series_list.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update movie & series lists [skip ci]" && git push)
