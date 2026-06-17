@@ -1,34 +1,31 @@
-name: Update movie list from Hugging Face datasets
- 
+name: Update movie list from Hugging Face
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'   # daily at midnight UTC
+    - cron: '0 0 * * *'   # daily
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
+          node-version: 20
 
       - name: Install dependencies
-        run: |
-          pip install huggingface_hub
+        run: npm install node-fetch  # if using Node <18; Node 20 has native fetch
 
       - name: Generate movie_list.json
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python scripts/generate_movie_list.py
+        run: node scripts/generate-movie-list.mjs
 
       - name: Commit and push changes
         run: |
