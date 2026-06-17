@@ -1,5 +1,5 @@
 name: Update movie list from Hugging Face
-
+ 
 on:
   push:
     branches: [main]
