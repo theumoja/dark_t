@@ -5,11 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'   # daily
+    - cron: '0 0 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:                # <-- add this block
+      contents: write           # allow pushing commits
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,9 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install dependencies
-        run: npm install node-fetch  # if using Node <18; Node 20 has native fetch
 
       - name: Generate movie_list.json
         env:
