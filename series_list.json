@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "title": "Nero",
+    "year": 2024,
+    "rating": 7,
+    "desc": "",
+    "poster": "https://huggingface.co/datasets/Otika234/images/resolve/main/series/Nero.png",
+    "seasons": {
+      "1": [
+        {
+          "title": "1.txt",
+          "encFile": "series/Nero/1/1.txt",
+          "keyHex": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        },
+        {
+          "title": "Arrival",
+          "encFile": "series/Nero/1/Arrival.mp4.enc",
+          "keyHex": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        }
+      ]
+    }
+  }
+]
